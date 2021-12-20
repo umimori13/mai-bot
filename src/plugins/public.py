@@ -76,7 +76,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         }]))
     elif r == 4:
         img_p = Image.open(path)
-        draw_text(img_p, '呜呜呜', 0)
+        draw_text(img_p, '戳', 0)
         draw_text(img_p, '有尝试过玩Cytus II吗', 400)
         await poke.send(Message([{
             "type": "image",
@@ -104,6 +104,8 @@ async def _(bot: Bot, event: Event, state: T_State):
         await poke.send(Message('喵喵喵'))
     elif r == 13:
         await poke.send(Message('哭哭'))
+    elif r <=16:
+         await poke.send(Message('呜！'))
     else:
         await poke.send(Message([{
             "type": "poke",
