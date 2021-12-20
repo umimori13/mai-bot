@@ -8,6 +8,8 @@ from nonebot.adapters.cqhttp import Message, Event, Bot
 from src.libraries.image import *
 from random import randint
 
+import time
+from collections import defaultdict
 
 help = on_command('help')
 
@@ -38,16 +40,86 @@ async def _group_poke(bot: Bot, event: Event, state: dict) -> bool:
 
 
 poke = on_notice(rule=_group_poke, priority=10, block=True)
+poke_dict = defaultdict(lambda: defaultdict(int))
 
 
 @poke.handle()
 async def _(bot: Bot, event: Event, state: T_State):
+    v = "default"
     if event.__getattribute__('group_id') is None:
         event.__delattr__('group_id')
-    await poke.send(Message([{
-        "type": "poke",
-        "data": {
-            "qq": f"{event.sender_id}"
-        }
-    }]))
+    else:
+        group_dict = poke_dict[event.__getattribute__('group_id')]
+        group_dict[event.sender_id] += 1
+        # v = await invoke_poke(event.group_id, event.sender_id)
+        # if v == "disabled":
+        #     await poke.finish()
+        #     return
+    r = randint(1, 20)
+    time.sleep(1)
+    if v == "limited":
+        await poke.send(Message([{
+            "type": "poke",
+            "data": {
+                "qq": f"{event.sender_id}"
+            }
+        }]))
+    elif r == 2:
+        await poke.send(Message('不许戳xwx'))
+    elif r == 3:
+        url = await get_jlpx('戳', '呜呜w', '闲着没事干')
+        await poke.send(Message([{
+            "type": "image",
+            "data": {
+                "file": url
+            }
+        }]))
+    elif r == 4:
+        img_p = Image.open(path)
+        draw_text(img_p, '呜呜呜', 0)
+        draw_text(img_p, '有尝试过玩Cytus II吗', 400)
+        await poke.send(Message([{
+            "type": "image",
+            "data": {
+                "file": f"base64://{str(image_to_base64(img_p), encoding='utf-8')}"
+            }
+        }]))
+    elif r == 5:
+        await poke.send(Message('呜呜呜再戳人家要哭哭了啦'))
+    elif r <= 7:
+        await poke.send(Message([{
+            "type": "image",
+            "data": {
+                "file": f"https://www.diving-fish.com/images/poke/{r - 5}.gif",
+            }
+        }]))
+    elif r <= 12:
+        await poke.send(Message([{
+            "type": "image",
+            "data": {
+                "file": f"https://www.diving-fish.com/images/poke/{r - 7}.jpg",
+            }
+        }]))
+    elif r == 1:
+        await poke.send(Message('喵喵喵'))
+    elif r == 13:
+        await poke.send(Message('哭哭'))
+    else:
+        await poke.send(Message([{
+            "type": "poke",
+            "data": {
+                "qq": f"{event.sender_id}"
+            }
+        }]))
+
+# @poke.handle()
+# async def _(bot: Bot, event: Event, state: T_State):
+#     if event.__getattribute__('group_id') is None:
+#         event.__delattr__('group_id')
+#     await poke.send(Message([{
+#         "type": "poke",
+#         "data": {
+#             "qq": f"{event.sender_id}"
+#         }
+#     }]))
 
