@@ -1,6 +1,7 @@
 from collections import defaultdict
 
-from nonebot import on_command, on_regex
+from nonebot import on_command, on_regex, get_driver
+from nonebot.log import logger
 from nonebot.typing import T_State
 from nonebot.adapters import Event, Bot
 from nonebot.adapters.cqhttp import Message
@@ -11,6 +12,28 @@ from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
 import re
+
+
+driver = get_driver()
+
+
+@driver.on_startup
+def _():
+    logger.info("Load help text successfully")
+    help_text: dict = get_driver().config.help_text
+    help_text['mai'] = ('查看舞萌相关功能', """小狐狸です、よろしく。
+可用命令如下：
+今日舞萌 查看今天的舞萌运势
+XXXmaimaiXXX什么 随机一首歌
+随个[dx/标准][绿黄红紫白]<难度> 随机一首指定条件的乐曲
+查歌<乐曲标题的一部分> 查询符合条件的乐曲
+[绿黄红紫白]id<歌曲编号> 查询乐曲信息或谱面信息
+<歌曲别名>是什么歌 查询乐曲别名对应的乐曲
+定数查歌 <定数>  查询定数对应的乐曲
+定数查歌 <定数下限> <定数上限>
+分数线 <难度+歌曲id> <分数线> 详情请输入“分数线 帮助”查看
+b40 账户名称 查看dx查分器中以dx计算的分数
+b50 账户名称 查看dx查分器中以universe计算的分数""")
 
 
 def song_txt(music: Music):
@@ -43,9 +66,10 @@ def inner_level_q(ds1, ds2=None):
         music_data = total_list.filter(ds=(ds1, ds2))
     else:
         music_data = total_list.filter(ds=ds1)
-    for music in sorted(music_data, key = lambda i: int(i['id'])):
+    for music in sorted(music_data, key=lambda i: int(i['id'])):
         for i in music.diff:
-            result_set.append((music['id'], music['title'], music['ds'][i], diff_label[i], music['level'][i]))
+            result_set.append(
+                (music['id'], music['title'], music['ds'][i], diff_label[i], music['level'][i]))
     return result_set
 
 
@@ -90,7 +114,8 @@ async def _(bot: Bot, event: Event, state: T_State):
         if res.groups()[1] == "":
             music_data = total_list.filter(level=level, type=tp)
         else:
-            music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[1])], type=tp)
+            music_data = total_list.filter(
+                level=level, diff=['绿黄红紫白'.index(res.groups()[1])], type=tp)
         if len(music_data) == 0:
             rand_result = "没有这样的乐曲哦。"
         else:
@@ -123,7 +148,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await search_music.send("没有找到这样的乐曲。")
     elif len(res) < 50:
         search_result = ""
-        for music in sorted(res, key = lambda i: int(i['id'])):
+        for music in sorted(res, key=lambda i: int(i['id'])):
             search_result += f"{music['id']}. {music['title']}\n"
         await search_music.finish(Message([
             {"type": "text",
@@ -145,7 +170,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     if groups[0] != "":
         try:
             level_index = level_labels.index(groups[0])
-            level_name = ['Basic', 'Advanced', 'Expert', 'Master', 'Re: MASTER']
+            level_name = ['Basic', 'Advanced',
+                          'Expert', 'Master', 'Re: MASTER']
             name = groups[1]
             music = total_list.by_id(name)
             chart = music['charts'][level_index]
@@ -218,7 +244,8 @@ BREAK: {chart['notes'][4]}
             await query_chart.send("未找到该乐曲")
 
 
-wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓绝赞', '收歌']
+wm_list = ['拼机', '推分', '越级', '下埋', '夜勤',
+           '练底力', '练手法', '打旧框', '干饭', '抓绝赞', '收歌']
 
 
 jrwm = on_command('今日舞萌', aliases={'今日mai'})
@@ -263,7 +290,8 @@ find_song = on_regex(r".+是什么歌")
 @find_song.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     regex = "(.+)是什么歌"
-    name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
+    name = re.match(regex, str(event.get_message())
+                    ).groups()[0].strip().lower()
     if name not in music_aliases:
         await find_song.finish("未找到此歌曲\n舞萌 DX 歌曲别名收集计划：https://docs.qq.com/sheet/DQ0pvUHh6b1hjcGpl")
         return
@@ -305,7 +333,8 @@ BREAK\t5/12.5/25(外加200落)'''
         try:
             grp = re.match(r, argv[0]).groups()
             level_labels = ['绿', '黄', '红', '紫', '白']
-            level_labels2 = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:MASTER']
+            level_labels2 = ['Basic', 'Advanced',
+                             'Expert', 'Master', 'Re:MASTER']
             level_index = level_labels.index(grp[0])
             chart_id = grp[2]
             line = float(argv[1])
@@ -361,9 +390,9 @@ best_50_pic = on_command('b50')
 async def _(bot: Bot, event: Event, state: T_State):
     username = str(event.get_message()).strip()
     if username == "":
-        payload = {'qq': str(event.get_user_id()),'b50':True}
+        payload = {'qq': str(event.get_user_id()), 'b50': True}
     else:
-        payload = {'username': username,'b50':  True}
+        payload = {'username': username, 'b50':  True}
     img, success = await generate50(payload)
     if success == 400:
         await best_50_pic.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
