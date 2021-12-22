@@ -25,6 +25,7 @@ driver.register_adapter("cqhttp", CQHTTPBot)
 driver.config.help_text = {}
 
 
+nonebot.load_from_toml("pyproject.toml")
 nonebot.load_plugins("src/plugins")
 nonebot.load_plugin("nonebot_plugin_apscheduler")
 

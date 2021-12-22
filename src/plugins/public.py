@@ -34,8 +34,8 @@ from collections import defaultdict
 #     }]))
 
 
+#帮助功能
 help = on_command('help')
-
 
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -58,9 +58,9 @@ async def _group_poke(bot: Bot, event: Event, state: dict) -> bool:
     return value
 
 
+#戳一戳功能
 poke = on_notice(rule=_group_poke, priority=10, block=True)
 poke_dict = defaultdict(lambda: defaultdict(int))
-
 
 @poke.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -133,14 +133,12 @@ async def _(bot: Bot, event: Event, state: T_State):
             }
         }]))
 
-# @poke.handle()
-# async def _(bot: Bot, event: Event, state: T_State):
-#     if event.__getattribute__('group_id') is None:
-#         event.__delattr__('group_id')
-#     await poke.send(Message([{
-#         "type": "poke",
-#         "data": {
-#             "qq": f"{event.sender_id}"
-#         }
-#     }]))
 
+#复读功能
+# repeat = on_message(priority=99)
+
+# @repeat.handle()
+# async def _(bot: Bot, event: Event, state: T_State):
+#     r = random.random()
+#     if r <= 0.0114514:
+#         await repeat.finish(event.get_message())

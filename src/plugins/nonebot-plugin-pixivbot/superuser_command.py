@@ -1,4 +1,4 @@
-from nonebot import on_command, logger
+from nonebot import on_command, logger,get_driver
 from nonebot.adapters.cqhttp import Bot, Event
 from nonebot.matcher import Matcher
 from nonebot.permission import SUPERUSER
@@ -16,10 +16,16 @@ _help_text = """触发语句：
 - 来张初音ミク图：搜索关键字初音ミク，从搜索结果随机抽选一张插画
 - 来张森倉円老师的图：搜索画师森倉円，从该画师的插画列表里随机抽选一张插画
 - 看看图114514：查看id为114514的插画
-- 来张私家车：从书签中随机抽选一张插画
+- 来张私家车：从书签中随机抽选一张插画"""
 
-更多功能：参见https://github.com/ssttkkl/nonebot-plugin-pixivbot
-"""
+driver = get_driver()
+
+
+@driver.on_startup
+def _():
+    logger.info("Load help text successfully")
+    help_text: dict = get_driver().config.help_text
+    help_text['pixivbot'] =('查看pixiv搜索相关功能', _help_text)
 
 
 def _get_user_or_group_id(event: Event):
