@@ -84,7 +84,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             }
         }]))
     elif r == 2:
-        await poke.send(Message('不许戳xwx'))
+        await poke.send(Message('不许戳'))
     # elif r == 3:
     #     url = await get_jlpx('戳', '呜呜w', '闲着没事干')
     #     await poke.send(Message([{

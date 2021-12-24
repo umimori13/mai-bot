@@ -147,14 +147,14 @@ if conf.pixiv_random_illust_query_enabled:
     mat.append_handler(before_handle)
     mat.append_handler(handle_random_illust_query)
 
-if conf.pixiv_poke_action:
-    if conf.__getattribute__(f'pixiv_{conf.pixiv_poke_action}_query_enabled'):
-        async def _group_poke(bot: Bot, event: Event, state: T_State) -> bool:
-            return isinstance(event, PokeNotifyEvent) and event.is_tome()
+# if conf.pixiv_poke_action:
+#     if conf.__getattribute__(f'pixiv_{conf.pixiv_poke_action}_query_enabled'):
+#         async def _group_poke(bot: Bot, event: Event, state: T_State) -> bool:
+#             return isinstance(event, PokeNotifyEvent) and event.is_tome()
 
 
-        group_poke = on_notice(_group_poke, priority=10, block=True)
-        group_poke.append_handler(before_handle)
-        group_poke.append_handler(locals()[f'handle_{conf.pixiv_poke_action}_query'])
-    else:
-        logger.warning(f"Bot will not respond to poke since {conf.pixiv_poke_action} is disabled.")
+#         group_poke = on_notice(_group_poke, priority=10, block=True)
+#         group_poke.append_handler(before_handle)
+#         group_poke.append_handler(locals()[f'handle_{conf.pixiv_poke_action}_query'])
+#     else:
+#         logger.warning(f"Bot will not respond to poke since {conf.pixiv_poke_action} is disabled.")

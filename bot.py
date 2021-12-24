@@ -24,6 +24,8 @@ driver = nonebot.get_driver()
 driver.register_adapter("cqhttp", CQHTTPBot)
 driver.config.help_text = {}
 
+nonebot.load_plugins("src/utils")
+nonebot.load_builtin_plugins()
 
 nonebot.load_from_toml("pyproject.toml")
 nonebot.load_plugins("src/plugins")
